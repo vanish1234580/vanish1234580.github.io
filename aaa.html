@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>创野风暴 | 定制开发 & AI Agent 解决方案</title>
+    <!-- Google Fonts & Font Awesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #050505;
+            font-family: 'Inter', sans-serif;
+            color: #f5f5f7;
+            line-height: 1.5;
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        }
+
+        /* 自定义滚动条 */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0a0a0a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3b3b3f;
+            border-radius: 8px;
+        }
+
+        /* 整体容器 */
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0 32px;
+        }
+
+        /* 玻璃态导航栏 */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 100;
+            padding: 20px 0;
+            transition: all 0.3s ease;
+            background-color: rgba(5, 5, 5, 0.65);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .navbar.scrolled {
+            padding: 12px 0;
+            background-color: rgba(5, 5, 5, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom-color: rgba(255, 255, 255, 0.1);
+        }
+        .nav-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #FFFFFF 0%, #9ca3ff 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .logo i {
+            background: none;
+            -webkit-background-clip: unset;
+            background-clip: unset;
+            color: #ffffff;
+            font-size: 1.7rem;
+            filter: drop-shadow(0 0 6px rgba(100, 108, 255, 0.6));
+        }
+        .nav-links {
+            display: flex;
+            gap: 40px;
+            list-style: none;
+            font-weight: 500;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: #e8e8ed;
+            font-size: 1rem;
+            transition: 0.2s;
+            letter-spacing: -0.2px;
+        }
+        .nav-links a:hover {
+            color: #ffffff;
+            opacity: 1;
+        }
+        .nav-cta {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(8px);
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            border: 0.5px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.25s;
+            color: white !important;
+        }
+        .nav-cta:hover {
+            background: #ffffff;
+            color: #050505 !important;
+            border-color: #ffffff;
+        }
+
+        /* 全局按钮 */
+        .btn-primary {
+            background: linear-gradient(105deg, #ffffff 0%, #b0b5ff 100%);
+            color: #050505;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 44px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            display: inline-block;
+            text-decoration: none;
+        }
+        .btn-primary:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 25px -5px rgba(130, 140, 255, 0.3);
+            background: linear-gradient(105deg, #ffffff, #c2c7ff);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            backdrop-filter: blur(4px);
+            padding: 14px 32px;
+            border-radius: 44px;
+            font-weight: 500;
+            color: white;
+            transition: 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-outline:hover {
+            border-color: white;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Hero 区 */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            padding-top: 100px;
+            overflow: hidden;
+        }
+        .hero-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px;
+            align-items: center;
+            width: 100%;
+        }
+        .hero-text h1 {
+            font-size: clamp(2.8rem, 6vw, 4.8rem);
+            font-weight: 700;
+            line-height: 1.1;
+            letter-spacing: -0.03em;
+            background: linear-gradient(135deg, #FFFFFF 70%, #b5baff 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 24px;
+        }
+        .hero-text p {
+            font-size: 1.2rem;
+            color: #b0b0bc;
+            margin-bottom: 36px;
+            max-width: 90%;
+        }
+        .btn-group {
+            display: flex;
+            gap: 18px;
+            flex-wrap: wrap;
+        }
+        .hero-visual {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .glass-sphere {
+            width: 380px;
+            height: 380px;
+            background: radial-gradient(circle at 30% 30%, rgba(140, 150, 255, 0.3), rgba(40, 30, 80, 0.6));
+            border-radius: 50%;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), inset 0 0 50px rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            animation: float 6s ease-in-out infinite;
+        }
+        .glass-sphere::after {
+            content: "?";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 80px;
+            opacity: 0.7;
+            filter: drop-shadow(0 0 12px #a5b4ff);
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+        .orbital-grid {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(circle at 20% 40%, rgba(100, 120, 255, 0.1) 1.5px, transparent 1px);
+            background-size: 28px 28px;
+            pointer-events: none;
+        }
+
+        /* 通用区块样式 */
+        section {
+            padding: 100px 0;
+            position: relative;
+        }
+        .section-label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: #a7acff;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+        .section-title {
+            font-size: clamp(2rem, 4vw, 3.2rem);
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+        .section-sub {
+            color: #8e8e9e;
+            max-width: 650px;
+            margin-bottom: 56px;
+            font-size: 1.1rem;
+        }
+
+        /* 服务卡片 */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 32px;
+        }
+        .service-card {
+            background: rgba(20, 20, 25, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 32px;
+            padding: 36px 28px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            transition: all 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+        .service-card:hover {
+            transform: translateY(-8px);
+            background: rgba(30, 30, 40, 0.8);
+            border-color: rgba(150, 160, 255, 0.3);
+            box-shadow: 0 25px 40px -15px rgba(0, 0, 0, 0.5);
+        }
+        .service-icon {
+            font-size: 2.8rem;
+            margin-bottom: 28px;
+            background: linear-gradient(120deg, #e0e4ff, #8c96ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .service-card h3 {
+            font-size: 1.7rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+        .service-card p {
+            color: #ababb7;
+            line-height: 1.5;
+            margin-bottom: 24px;
+        }
+        .link-arrow {
+            color: #c7cdff;
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: gap 0.2s;
+        }
+        .link-arrow i {
+            font-size: 0.8rem;
+        }
+        .link-arrow:hover {
+            gap: 12px;
+            color: white;
+        }
+
+        /* 优势/数据区域 */
+        .stats-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 40px;
+            margin: 60px 0 20px;
+            background: linear-gradient(145deg, rgba(15, 15, 20, 0.7), rgba(8, 8, 12, 0.5));
+            border-radius: 64px;
+            padding: 60px 40px;
+            border: 0.5px solid rgba(255, 255, 255, 0.05);
+        }
+        .stat-item {
+            text-align: center;
+            flex: 1;
+        }
+        .stat-number {
+            font-size: 2.6rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff, #b5bcff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .stat-label {
+            color: #8a8a98;
+            margin-top: 8px;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+        }
+
+        /* 案例展示 */
+        .case-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 32px;
+        }
+        .case-card {
+            background: #0c0c10;
+            border-radius: 28px;
+            overflow: hidden;
+            transition: all 0.35s;
+            border: 1px solid #1f1f2a;
+        }
+        .case-card:hover {
+            border-color: #333544;
+            transform: translateY(-6px);
+        }
+        .case-img {
+            height: 210px;
+            background: linear-gradient(145deg, #15161e, #030305);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: #6c74f0;
+        }
+        .case-img i {
+            font-size: 58px;
+            opacity: 0.7;
+        }
+        .case-info {
+            padding: 28px 24px;
+        }
+        .case-info h4 {
+            font-size: 1.4rem;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+        .case-info p {
+            color: #9b9baa;
+            margin-bottom: 20px;
+        }
+        .tech-tags {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .tech-tags span {
+            background: rgba(108, 116, 240, 0.15);
+            padding: 5px 12px;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: #bdc2ff;
+        }
+
+        /* CTA 区域 */
+        .cta-section {
+            background: radial-gradient(circle at 20% 30%, #13142a, #040408);
+            border-radius: 56px;
+            padding: 70px 48px;
+            text-align: center;
+            margin: 40px 0;
+            border: 1px solid rgba(110, 120, 230, 0.3);
+        }
+        .cta-section h2 {
+            font-size: 2.4rem;
+            margin-bottom: 18px;
+        }
+        .cta-section p {
+            max-width: 550px;
+            margin: 0 auto 32px;
+            color: #bcbce6;
+        }
+
+        /* 页脚 */
+        footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 60px 0 40px;
+            background: #020205;
+        }
+        .footer-grid {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 48px;
+        }
+        .footer-brand p {
+            margin-top: 16px;
+            color: #7e7e8a;
+            max-width: 260px;
+        }
+        .footer-links {
+            display: flex;
+            gap: 60px;
+            flex-wrap: wrap;
+        }
+        .link-col h4 {
+            font-weight: 500;
+            margin-bottom: 20px;
+            font-size: 1rem;
+        }
+        .link-col a {
+            display: block;
+            color: #9a9aab;
+            text-decoration: none;
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+            transition: 0.2s;
+        }
+        .link-col a:hover {
+            color: white;
+        }
+        .copyright {
+            text-align: center;
+            margin-top: 60px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            color: #6b6b7a;
+            font-size: 0.8rem;
+        }
+
+        /* 动画滚动 */
+        .fade-up {
+            opacity: 0;
+            transform: translateY(35px);
+            transition: opacity 0.7s cubic-bezier(0.2, 0.9, 0.4, 1.1), transform 0.7s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+        .fade-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* 响应式 */
+        @media (max-width: 992px) {
+            .hero-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            .hero-text p {
+                max-width: 100%;
+            }
+            .btn-group {
+                justify-content: center;
+            }
+            .stats-grid {
+                flex-direction: column;
+                align-items: center;
+                gap: 30px;
+            }
+            .nav-links {
+                gap: 25px;
+            }
+            .container {
+                padding: 0 24px;
+            }
+            .cta-section {
+                padding: 50px 24px;
+            }
+        }
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 16px;
+            }
+            .nav-links {
+                gap: 20px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            section {
+                padding: 70px 0;
+            }
+            .glass-sphere {
+                width: 260px;
+                height: 260px;
+            }
+            .service-card {
+                padding: 28px 20px;
+            }
+        }
+        /* 背景装饰 */
+        .bg-glow {
+            position: fixed;
+            width: 80vw;
+            height: 80vw;
+            background: radial-gradient(circle, rgba(70, 80, 200, 0.08) 0%, rgba(0, 0, 0, 0) 70%);
+            border-radius: 50%;
+            top: -20%;
+            right: -10%;
+            z-index: -2;
+            pointer-events: none;
+        }
+        .bg-glow-2 {
+            bottom: -10%;
+            left: -20%;
+            position: fixed;
+            width: 90vw;
+            height: 90vw;
+            background: radial-gradient(circle, rgba(150, 100, 255, 0.05) 0%, transparent 70%);
+            border-radius: 50%;
+            z-index: -2;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-glow"></div>
+    <div class="bg-glow-2"></div>
+    <!-- 导航栏 -->
+    <nav class="navbar" id="navbar">
+        <div class="container nav-container">
+            <div class="logo">
+                <i class="fas fa-bolt"></i> 创野风暴
+            </div>
+            <ul class="nav-links">
+                <li><a href="#home">首页</a></li>
+                <li><a href="#services">服务</a></li>
+                <li><a href="#cases">案例</a></li>
+                <li><a href="#about">关于</a></li>
+                <li><a href="#contact">联系</a></li>
+            </ul>
+            <a href="#" class="nav-cta">开始项目 <i class="fas fa-arrow-right"></i></a>
+        </div>
+    </nav>
+
+    <main>
+        <!-- Hero 区 -->
+        <section id="home" class="hero">
+            <div class="container hero-content">
+                <div class="hero-text fade-up">
+                    <h1>定制开发 &<br>AI Agent 风暴引擎</h1>
+                    <p>为企业构建颠覆式智能体与深度定制系统，从概念到落地，以风暴速度重塑未来。</p>
+                    <div class="btn-group">
+                        <a href="#" class="btn-primary">探索解决方案</a>
+                        <a href="#" class="btn-outline"><i class="fas fa-play-circle"></i> 观看演示</a>
+                    </div>
+                </div>
+                <div class="hero-visual fade-up">
+                    <div class="glass-sphere"></div>
+                    <div class="orbital-grid"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 服务亮点 -->
+        <section id="services">
+            <div class="container">
+                <div class="fade-up">
+                    <div class="section-label">核心能力</div>
+                    <h2 class="section-title">智创·定制·进化</h2>
+                    <div class="section-sub">从定制开发到AI智能体生态，提供全链路技术解决方案，加速企业数字化跃迁。</div>
+                </div>
+                <div class="services-grid">
+                    <div class="service-card fade-up">
+                        <div class="service-icon"><i class="fas fa-code"></i></div>
+                        <h3>定制软件开发</h3>
+                        <p>全栈级定制开发，企业级系统、SaaS平台、物联网及高性能后端架构，交付可靠且可扩展的卓越软件。</p>
+                        <a href="#" class="link-arrow">了解更多 <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                    <div class="service-card fade-up">
+                        <div class="service-icon"><i class="fas fa-microchip"></i></div>
+                        <h3>AI Agent 智能体</h3>
+                        <p>打造自主决策、多模态交互AI Agents，赋能客服、数据分析、流程自动化，让企业拥有智能劳动力。</p>
+                        <a href="#" class="link-arrow">了解更多 <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                    <div class="service-card fade-up">
+                        <div class="service-icon"><i class="fas fa-brain"></i></div>
+                        <h3>企业AI咨询</h3>
+                        <p>深入业务场景诊断，规划AI转型路线图，将大语言模型与业务系统无缝集成，释放数据潜力。</p>
+                        <a href="#" class="link-arrow">了解更多 <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                    <div class="service-card fade-up">
+                        <div class="service-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                        <h3>智能自动化</h3>
+                        <p>RPA+AI工作流，端到端业务流程自动化，实现运营效率革命，大幅降低人为成本与错误率。</p>
+                        <a href="#" class="link-arrow">了解更多 <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 数据与优势（企业信任） -->
+        <div class="container">
+            <div class="stats-grid fade-up">
+                <div class="stat-item">
+                    <div class="stat-number">98%</div>
+                    <div class="stat-label">项目交付满意度</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">120+</div>
+                    <div class="stat-label">AI Agent 部署实例</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">50+</div>
+                    <div class="stat-label">企业技术伙伴</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">3x</div>
+                    <div class="stat-label">开发效率提升</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 案例精选 -->
+        <section id="cases">
+            <div class="container">
+                <div class="fade-up">
+                    <div class="section-label">成功实践</div>
+                    <h2 class="section-title">尖端项目，驱动变革</h2>
+                    <div class="section-sub">从智能客服到产业大脑，创野风暴为多个行业先锋创造价值。</div>
+                </div>
+                <div class="case-grid">
+                    <div class="case-card fade-up">
+                        <div class="case-img"><i class="fas fa-robot"></i></div>
+                        <div class="case-info">
+                            <h4>智语·AI Agent 客服平台</h4>
+                            <p>基于大模型的多轮对话与意图识别，自动化解决85%用户问题，降低企业人力成本40%以上。</p>
+                            <div class="tech-tags"><span>LLM</span><span>RAG</span><span>LangChain</span></div>
+                        </div>
+                    </div>
+                    <div class="case-card fade-up">
+                        <div class="case-img"><i class="fas fa-chart-line"></i></div>
+                        <div class="case-info">
+                            <h4>智能供应链决策系统</h4>
+                            <p>定制化AI预测引擎，结合实时数据优化库存与物流，提升整体供应链效率32%。</p>
+                            <div class="tech-tags"><span>预测AI</span><span>大数据</span><span>时序模型</span></div>
+                        </div>
+                    </div>
+                    <div class="case-card fade-up">
+                        <div class="case-img"><i class="fas fa-university"></i></div>
+                        <div class="case-info">
+                            <h4>金融风控智能体</h4>
+                            <p>AI Agent 实时分析交易行为，毫秒级识别欺诈风险，为金融机构构建动态风控屏障。</p>
+                            <div class="tech-tags"><span>深度学习</span><span>实时流处理</span><span>图计算</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 技术共鸣 CTA区域 -->
+        <div class="container">
+            <div class="cta-section fade-up">
+                <h2>让AI Agent与定制开发成为你的核心竞争力</h2>
+                <p>创野风暴 — 技术狂想与工程严谨的融合，为您的业务注入智能风暴。</p>
+                <a href="#" class="btn-primary" style="background: white; color: #0a0a0a;">与专家对话 <i class="fas fa-long-arrow-alt-right"></i></a>
+            </div>
+        </div>
+
+        <!-- 关于公司/文化简语 -->
+        <section id="about" style="padding-top: 0;">
+            <div class="container">
+                <div class="fade-up" style="display: flex; flex-direction: column; align-items: center; text-align: center;">
+                    <div class="section-label">创新基因</div>
+                    <h2 class="section-title">不止于代码，我们塑造智能浪潮</h2>
+                    <p style="max-width: 800px; color: #afafc2; margin-bottom: 36px;">创野风暴汇聚顶尖工程师与AI科学家，以“野性创新，风暴速度”为信条，为企业提供可落地、有远见的技术方案。我们相信，每个业务都值得拥有专属的智能Agent。</p>
+                    <div style="display: flex; gap: 24px; flex-wrap: wrap; justify-content: center;">
+                        <span style="background: #1b1b23; padding: 8px 18px; border-radius: 60px;"><i class="fas fa-gem"></i> 企业级架构</span>
+                        <span style="background: #1b1b23; padding: 8px 18px; border-radius: 60px;"><i class="fas fa-cloud"></i> 云原生</span>
+                        <span style="background: #1b1b23; padding: 8px 18px; border-radius: 60px;"><i class="fas fa-robot"></i> AI-Native</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer id="contact">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <div class="logo" style="font-size: 1.8rem;"><i class="fas fa-bolt"></i> 创野风暴</div>
+                    <p>释放智能边界，定制无限可能。<br>未来，由风暴引领。</p>
+                </div>
+                <div class="footer-links">
+                    <div class="link-col">
+                        <h4>探索</h4>
+                        <a href="#">定制开发</a>
+                        <a href="#">AI Agent</a>
+                        <a href="#">行业方案</a>
+                    </div>
+                    <div class="link-col">
+                        <h4>支持</h4>
+                        <a href="#">文档中心</a>
+                        <a href="#">开发者社区</a>
+                        <a href="#">服务条款</a>
+                    </div>
+                    <div class="link-col">
+                        <h4>联系</h4>
+                        <a href="#"><i class="far fa-envelope"></i> hello@stormcraft.com</a>
+                        <a href="#"><i class="fab fa-twitter"></i> Twitter</a>
+                        <a href="#"><i class="fab fa-github"></i> GitHub</a>
+                    </div>
+                </div>
+            </div>
+            <div class="copyright">
+                ? 2025 创野风暴 | 定制开发与AI Agent先驱 — 科技重塑商业形态
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // 滚动时导航栏样式变化
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 20) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Intersection Observer 实现滚动渐现动画
+        const fadeElements = document.querySelectorAll('.fade-up');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    // 可选择保持可见后停止观察
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1, rootMargin: "0px 0px -30px 0px" });
+
+        fadeElements.forEach(el => observer.observe(el));
+
+        // 平滑滚动内部锚点
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                const href = this.getAttribute('href');
+                if (href !== "#" && href !== "") {
+                    const target = document.querySelector(href);
+                    if (target) {
+                        e.preventDefault();
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
